@@ -59,8 +59,8 @@ void executeExternalCommand(char **str) {
          // if (execvp("echo", execArgs) < 0) {     /* execute the command  */
          // char *argv[] = {"ls", "-l", "-h", "-a", NULL};
 		//char *argv[] = {"ls", "-l", "-h", "-a", NULL}; 
-		char *argv[] = {"echo", "this is what i Typed!", NULL};     			
- 		if (execvp(argv[0], argv) < 0){
+		// this is the one you were using : char *argv[] = {"echo", "this is what i Typed!", NULL};     			
+ 		if (execvp(str[0], str) < 0){
 	 
 		
 		printf("*** ERROR: exec failed\n");
