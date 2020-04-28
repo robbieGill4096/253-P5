@@ -8,74 +8,73 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+
 void init_history(void); //builds data structures for recording cmd history
 void add_history(char *cmd, int exitStatus); //Adds an entry to the history
 void clear_history(void); //Frees all malloc'd memory in the history
 void print_history(int firstSequenceNumber); //Prints the history to stdout
 int showtok(char *bfr);
-char *tokenArr[4096];
 char path[256];
 char *newbuff;
 void executeInternalCommand(char *str);
-void executeExternalCommand();
+void executeExternalCommand(char **str);
 char *strdup(const char *s);
 
+char *target;
 
 
 
+//void executeCommand(char *str) {
 
-void executeCommand(char *str) {
+//if (strcmp(args[0],"cd") == 0){
 
-if (strcmp(str,"cd") == 0){
-printf("running INTERNAl command code");
-executeInternalCommand(str);
+//printf("running INTERNAl command code");
+//executeInternalCommand(str);
 
-}
-
-
-else{
-printf("running external command code");
-executeExternalCommand();
-
-}
+//}
 
 
+//else{
+//printf("running external command code");
+//executeExternalCommand();
 
-}
+//}
 
 
 
-void executeExternalCommand() {
+//}
 
-	int pid = fork();
-	if (pid == 0)
-	{
-	
-	//int cmdStatus = execvp (tokenArr[0], tokenArr);
+
+
+void executeExternalCommand(char **str) {
+     pid_t  pid;
+     int    status;
+
+     if ((pid = fork()) < 0) {     /* fork a child process           */
+          printf("*** ERROR: forking child process failed\n");
+          exit(1);
+     }
+     else if (pid == 0) {          /* for the child process:         */
 	//char *execArgs[] = { "echo", "Hello, World!", NULL };
-  	//int cmdStatus = execvp("echo", execArgs);
-	//add_history(newbuff, cmdStatus);
-	exit(1);	
-	}
-
-	else if (pid > 0)
-	{
-		fflush(stdout);
-		int exitStatus;
+         // if (execvp("echo", execArgs) < 0) {     /* execute the command  */
+         // char *argv[] = {"ls", "-l", "-h", "-a", NULL};
+		//char *argv[] = {"ls", "-l", "-h", "-a", NULL}; 
+		char *argv[] = {"echo", "this is what i Typed!", NULL};     			
+ 		if (execvp(argv[0], argv) < 0){
+	 
 		
-		wait(&exitStatus);
+		printf("*** ERROR: exec failed\n");
+               exit(1);
+          }
+		else {
 
-		int actualExitStatus = WEXITSTATUS(exitStatus);
-			add_history(newbuff, actualExitStatus);
 
-
-	
-	}
-	else
-	{
-		perror("Fork failed");
-	}
-
+			}
+     }
+     //else {                                  /* for the parent:      */
+          //while (wait(&status) != pid)       /* wait for completion  */
+               //;
+     //}
 }
 
 
@@ -87,8 +86,8 @@ void executeInternalCommand(char *str)
 	char *args[1000];
 	int i =0;
  
-	char *target;
-	target=malloc(4096);
+	char *target=malloc(4096);
+	//target=malloc(4096);
 	memcpy(target,str,4096);//removed * from *memcpy
 	
 	char *p = strtok (str," ");
@@ -127,6 +126,7 @@ void executeInternalCommand(char *str)
 				printf("%s: No such file or directory",target);
 				add_history(target,1);
 			}
+			
 		}
 	}
 //---------------------------------------
@@ -147,12 +147,23 @@ void executeInternalCommand(char *str)
 	}
 	else //command is unrecognized  
 	{	
-		add_history(target,127);
-		for (int index=0;index < command_count;index++)
-		{
+		//add_history(target,127);
+		//for (int index=0;index < command_count;index++)
+		//{
 			
-			printf("[%d] %s\n",index,args[index]);		
-		}		
+			//printf("[%d] %s\n",index,args[index]);		
+		//}
+		char *strict_args[command_count+1];
+		for (int index=0; index < command_count;index++)
+		{
+		strict_args[index] = args[index];
+		}
+
+
+		strict_args[command_count] = NULL;
+		executeExternalCommand(strict_args);
+
+		
 	}
 
 	free(target);

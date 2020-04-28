@@ -34,7 +34,7 @@ fputs("$",stderr);
 			bfr[strlen(bfr)-1] = '\0'; //replace newline with null
 			//executeCommand(bfr);
 			
-			executeCommand(bfr);
+			executeInternalCommand(bfr);
 			
 			fputs("$",stderr);
 
