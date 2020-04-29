@@ -17,64 +17,34 @@ int showtok(char *bfr);
 char path[256];
 char *newbuff;
 void executeInternalCommand(char *str);
-void executeExternalCommand(char **str);
+void executeExternalCommand(char **str, char *target);
 char *strdup(const char *s);
 
 char *target;
 
 
-
-//void executeCommand(char *str) {
-
-//if (strcmp(args[0],"cd") == 0){
-
-//printf("running INTERNAl command code");
-//executeInternalCommand(str);
-
-//}
-
-
-//else{
-//printf("running external command code");
-//executeExternalCommand();
-
-//}
-
-
-
-//}
-
-
-
-void executeExternalCommand(char **str) {
+void executeExternalCommand(char **str, char *target) {
      pid_t  pid;
      int    status;
-
+	//printf("%s",target);
+	//add_history(target,0);
      if ((pid = fork()) < 0) {     /* fork a child process           */
           printf("*** ERROR: forking child process failed\n");
           exit(1);
      }
      else if (pid == 0) {          /* for the child process:         */
-	//char *execArgs[] = { "echo", "Hello, World!", NULL };
-         // if (execvp("echo", execArgs) < 0) {     /* execute the command  */
-         // char *argv[] = {"ls", "-l", "-h", "-a", NULL};
-		//char *argv[] = {"ls", "-l", "-h", "-a", NULL}; 
-		// this is the one you were using : char *argv[] = {"echo", "this is what i Typed!", NULL};     			
- 		if (execvp(str[0], str) < 0){
-	 
 		
-		printf("*** ERROR: exec failed\n");
-               exit(1);
-          }
-		else {
+		execvp(str[0], str);
+		//char *deref_args = *str;
+		
+		exit(1);
 
-
-			}
      }
-     //else {                                  /* for the parent:      */
-          //while (wait(&status) != pid)       /* wait for completion  */
-               //;
-     //}
+     else {                                  /* for the parent:      */
+          while (wait(&status) != pid)       /* wait for completion  */
+		;
+     }
+	add_history(target,0);
 }
 
 
@@ -161,7 +131,7 @@ void executeInternalCommand(char *str)
 
 
 		strict_args[command_count] = NULL;
-		executeExternalCommand(strict_args);
+		executeExternalCommand(strict_args,target);
 
 		
 	}
