@@ -16,13 +16,13 @@ void executeCommand(char *str);
 
 int main()
 {  
-char bfr[MAXLINE];//
 
+char bfr[MAXLINE];//
 fputs("$",stderr);
 	init_history();
 	while (fgets(bfr, MAXLINE,stdin) != NULL) 
 	{
-
+		
 		
 		if (strlen(bfr) == MAXLINE-1)//checks for overflow from user input.
 		{ 
@@ -30,17 +30,18 @@ fputs("$",stderr);
 		}
 		else
 		{
-		
+			if(strlen(bfr) >1){
 			bfr[strlen(bfr)-1] = '\0'; //replace newline with null
 			//executeCommand(bfr);
 			
-			executeInternalCommand(bfr);
+			executeInternalCommand(bfr);}
 			
 			fputs("$",stderr);
 
 		}
 	}
 		return 0;
+
 }
 
 

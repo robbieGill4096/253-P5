@@ -13,38 +13,53 @@ void init_history(void); //builds data structures for recording cmd history
 void add_history(char *cmd, int exitStatus); //Adds an entry to the history
 void clear_history(void); //Frees all malloc'd memory in the history
 void print_history(int firstSequenceNumber); //Prints the history to stdout
-int showtok(char *bfr);
-char path[256];
-char *newbuff;
+
 void executeInternalCommand(char *str);
 void executeExternalCommand(char **str, char *target);
-char *strdup(const char *s);
+
+
+char path[256];
+
+
+
 
 char *target;
 
 
 void executeExternalCommand(char **str, char *target) {
-     pid_t  pid;
-     int    status;
-	//printf("%s",target);
-	//add_history(target,0);
+     pid_t pid;
+     int status;
+	
      if ((pid = fork()) < 0) {     /* fork a child process           */
           printf("*** ERROR: forking child process failed\n");
           exit(1);
      }
      else if (pid == 0) {          /* for the child process:         */
 		
-		execvp(str[0], str);
-		//char *deref_args = *str;
+		int exitStatus = execvp(str[0], str);
+		if(exitStatus == -1)
+		{	int index=0;
+			while(str[index] != NULL)
+			{
+			
+			printf("%s ",str[index]);	
+			index++;	
+			}
+			printf(": command not found\n");
+		}
 		
 		exit(1);
-
      }
      else {                                  /* for the parent:      */
           while (wait(&status) != pid)       /* wait for completion  */
 		;
      }
-	add_history(target,0);
+	if(status == 0){
+	add_history(target,0);}
+	else
+	{
+	add_history(target,1);		
+	}
 }
 
 
@@ -138,10 +153,6 @@ void executeInternalCommand(char *str)
 
 	free(target);
 }
-
-//	**calculates the number of commands read in from a pointer**
-//--------------------------------------------------------------
-//--------------------------------------------------------------
 
 
 
