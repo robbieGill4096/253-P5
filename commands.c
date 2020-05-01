@@ -14,17 +14,9 @@ void add_history(char *cmd, int exitStatus); //Adds an entry to the history
 void clear_history(void); //Frees all malloc'd memory in the history
 void print_history(int firstSequenceNumber); //Prints the history to stdout
 
-void executeInternalCommand(char *str);
 void executeExternalCommand(char **str, char *target);
-
-
-char path[256];
-
-
-
-
+void executeCommand(char *str);
 char *target;
-
 
 void executeExternalCommand(char **str, char *target) {
      pid_t pid;
@@ -62,17 +54,14 @@ void executeExternalCommand(char **str, char *target) {
 	}
 }
 
-
-
-void executeInternalCommand(char *str)
+void executeCommand(char *str)
 {	
 	
 	char current_dir_path[100]; 
 	char *args[1000];
 	int i =0;
- 
+
 	char *target=malloc(4096);
-	//target=malloc(4096);
 	memcpy(target,str,4096);//removed * from *memcpy
 	
 	char *p = strtok (str," ");
@@ -92,12 +81,8 @@ void executeInternalCommand(char *str)
 	  free(target);
 	  exit(0);
 	} 
-//	**CD COMMAND**
-//---------------------------------------
-//---------------------------------------
 	else if (strcmp(args[0], "cd") == 0)
 	{
-	
 		if(command_count >=2) // makes sure cd also contains a path name.
 		{
 			if(chdir(args[1]) == 0)//checks that directory user attempted to cd to exists 0 ==true
@@ -108,14 +93,11 @@ void executeInternalCommand(char *str)
 			}
 			else //if directory is not found prints error message including failed directory name. 
 			{
-				printf("%s: No such file or directory",target);
+				printf("%s: No such file or directory\n",target);
 				add_history(target,1);
 			}
-			
 		}
 	}
-//---------------------------------------
-//---------------------------------------
 	else if (strcmp(args[0], "history") == 0)
 	{
 		if(command_count == 1 ||atoi(args[1]) == 0 )
@@ -123,28 +105,14 @@ void executeInternalCommand(char *str)
 			add_history(target,0);
 			print_history(0);
 		}
-		else if(command_count > 0 && atoi(args[1])>0 && atoi(args[1]) < 10)
-		{
-			//if user specifies how much of the sequence.
-			//add_history(target,0);
-			//print_history(atoi(args[1]));
-		}
 	}
-	else //command is unrecognized  
+	else
 	{	
-		//add_history(target,127);
-		//for (int index=0;index < command_count;index++)
-		//{
-			
-			//printf("[%d] %s\n",index,args[index]);		
-		//}
 		char *strict_args[command_count+1];
 		for (int index=0; index < command_count;index++)
 		{
 		strict_args[index] = args[index];
 		}
-
-
 		strict_args[command_count] = NULL;
 		executeExternalCommand(strict_args,target);
 
